@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Dashboard - Sistema de Inventario</title>
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #004080;
+            margin: 0 0 1rem 0;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+            color: #28a745;
+        }
+
+        .recent-transactions {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+        }
+
+        .recent-transactions h2 {
+            color: #004080;
+            margin: 0 0 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="{{ url_for('dashboard') }}">Inicio</a>
+        <a href="{{ url_for('products') }}">Productos</a>
+        <a href="{{ url_for('customers') }}">Clientes</a>
+        <a href="{{ url_for('suppliers') }}">Proveedores</a>
+        <a href="{{ url_for('invoices') }}">Facturas</a>
+        <a href="{{ url_for('cash') }}">Caja</a>
+        <a href="{{ url_for('pos') }}">Punto de Venta</a>
+        <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+    </div>
+    
+    <div class="dashboard">
+        <h1>Panel de Control</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Productos</h3>
+                <p class="stat-number">{{ product_count }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Clientes</h3>
+                <p class="stat-number">{{ customer_count }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Facturas</h3>
+                <p class="stat-number">{{ invoice_count }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Ventas Totales</h3>
+                <p class="stat-number">Bs. {{ "%.2f"|format(total_sales) }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Balance en Caja</h3>
+                <p class="stat-number">Bs. {{ "%.2f"|format(cash_balance) }}</p>
+            </div>
+        </div>
+
+        <div class="recent-transactions">
+            <h2>Transacciones Recientes</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Método de Pago</th>
+                        <th>Descripción</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction, payment_method in recent_transactions %}
+                    <tr>
+                        <td>{{ transaction.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ 'Ingreso' if transaction.transaction_type == 'income' else 'Egreso' }}</td>
+                        <td>{{ payment_method.name }}</td>
+                        <td>{{ transaction.description }}</td>
+                        <td>Bs. {{ "%.2f"|format(transaction.amount) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
